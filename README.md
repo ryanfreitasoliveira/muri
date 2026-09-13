@@ -44,7 +44,7 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 ## ✨ Funcionalidades
 
 - 💬 **Fórum geral** — criação de tópicos, respostas, busca e filtro por tags
-- 🎓 **Cursos** — espaço/fórum privado por curso, com grade, documentos e contatos
+- 📚 **Cursos** — espaço/fórum privado por curso, com grade, documentos e contatos
 - 🗺️ **Mapa interativo** — pontos do campus (blocos, RU, biblioteca, bicicletário...) com filtros
 - 📅 **Agenda** — criação de eventos, podendo vincular a um local do mapa
 - 🏷️ **Tags** — organização e busca de tópicos
@@ -90,7 +90,6 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 <a id="tecnologias"></a>
 ## 🛠️ Tecnologias
 
-> ✍️ Preencha conforme a stack escolhida — deixei uma estrutura comum como sugestão.
 
 - **Front-end:** `a definir`
 - **Back-end:** `a definir`
@@ -100,7 +99,6 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 <a id="como-executar"></a>
 ## 🚀 Como executar o projeto
 
-> ✍️ Ajuste os comandos abaixo assim que a stack estiver definida.
 
 ```bash
 # 1. Clonar o repositório
@@ -124,7 +122,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 <div align="center">
 
-Feito por alunos da UFRPE 💚
+Feito por alunos da UFRPE 🎓
 
 [⬆ voltar ao topo](#topo)
 
