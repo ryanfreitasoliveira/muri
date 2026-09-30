@@ -2,7 +2,7 @@ import rich
 import time
 import os 
 from mural_muri import mural
-from init import Cadastro
+from usuario import Cadastro
 
 
 def start_menu():
