@@ -1,7 +1,7 @@
 <a id="topo"></a>
 <div align="center">
 
-# 🎓 M.U.R.I. - **M**ural **U**niversitário de **R**ede **I**nterativa
+# 🎓 M.U.R.I. - Mural Universitário de Rede Interativa
 
 
 **Fórum aberto para a comunidade acadêmica e alunos visitantes da Universidade Federal Rural de Pernambuco (UFRPE)**
