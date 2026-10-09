@@ -109,17 +109,53 @@ class BotaoResponder(Button):
         self.topico_id = str(topico_id)
 
 
+def montar_titulo_topico(topico):
+    autor = topico.autor.username if topico.autor else "desconhecido"
+
+    visualizacoes = getattr(topico, "visualizacoes", 0)
+    total_comentarios = len(listar_respostas(topico.id))
+
+    return (
+        f"{autor} | {topico.titulo}"
+        f"    👁 {visualizacoes}"
+        f"    💬 {total_comentarios}"
+    )
+
+
 class TopicoItem(Collapsible):
-    """Tópico expansível com autor, conteúdo Markdown, tags e comentários colapsáveis."""
+    """Colapsável do tópico com estatísticas e comentários."""
+
     def __init__(self, topico):
-        autor = topico.autor.username if topico.autor else "desconhecido"
-        conteudo = Markdown(topico.mensagem or "*(sem descrição)*", id=f"mensagem-{topico.id}")
-        tags = Label("  ".join(f"[{tag}]" for tag in topico.tags) if topico.tags else "Sem tags", classes="tags-topico")
-        self.caixa_respostas = Vertical(classes="lista-comentarios")
-        self.comentarios = Collapsible(self.caixa_respostas, title="Comentarios:", collapsed=True, classes="comentarios")
-        controles = Horizontal(self.comentarios, BotaoResponder(topico.id), classes="linha-comentarios")
-        super().__init__(conteudo, tags, controles, title=f"{autor}  |  {topico.titulo}", collapsed=True)
+        caixa = VerticalScroll(classes="respostas")
+
+        comentarios = Collapsible(
+            caixa,
+            title="Comentarios:",
+            collapsed=True,
+        )
+
+        with_botoes = Horizontal(
+            comentarios,
+            BotaoResponder(topico.id),
+            classes="linha-comentarios",
+        )
+
+                
+        super().__init__(
+            Label(
+                topico.mensagem or "(sem mensagem)",
+                markup=False,
+                classes="texto-topico",
+            ),
+            with_botoes,
+            title=montar_titulo_topico(topico),
+            collapsed=True,
+        )
+        
+        
         self.topico = topico
+        self.caixa_respostas = caixa
+        self.colapsavel_comentarios = comentarios
 
 
 class NovaRespostaModal(ModalScreen[str | None]):
@@ -165,6 +201,13 @@ class MURI(App):
     .comentario { height: auto; margin: 0 0 1 0; }
     .autor-comentario { width: 20; color: $primary; text-style: bold; }
     #lista_topicos { height: 1fr; }
+    CollapsibleTitle {background: transparent; }
+    CollapsibleTitle:hover {background: transparent; }
+    .texto-topico {margin-bottom: 2; }
+    .linha-comentarios {
+    height: auto; min-height: 3; align: left middle; }
+    .linha-comentarios Collapsible {height: auto; min-height: 3; margin: 0; padding: 0; }
+    .linha-comentarios CollapsibleTitle {height: 3; padding: 0 1; }
     """
 
     def __init__(self):
@@ -245,11 +288,26 @@ class MURI(App):
         return None
 
     @on(Collapsible.Expanded)
-    def ao_expandir(self, event: Collapsible.Expanded) -> None:
+    def ao_expandir(self, event: Collapsible.Expanded):
         item = event.collapsible
-        if isinstance(item, TopicoItem):
-            abrir_topico(item.topico.id)
-            self.carregar_respostas(item)
+
+        if not isinstance(item, TopicoItem):
+            return
+
+        topico_aberto, erro = abrir_topico(item.topico.id)
+
+        if erro:
+            self.notify(erro, severity="error")
+            return
+
+        # Atualiza os dados do tópico com os valores do banco.
+        item.topico = topico_aberto
+
+        # Atualiza o título com a visualização mais recente
+        # e a quantidade atual de comentários.
+        item.title = montar_titulo_topico(item.topico)
+
+        self.carregar_respostas(item)
 
     @on(Button.Pressed, ".responder")
     def abrir_novo_comentario(self, event: Button.Pressed) -> None:
