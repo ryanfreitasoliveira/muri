@@ -1,11 +1,13 @@
 # models/resposta.py
 from dataclasses import dataclass, field
 from datetime import datetime
-from models.usuario import Usuario
+from models.usuario import Cadastro
+import uuid
 
 @dataclass
 class Resposta:
-    autor: Usuario
+    topico_id: str
+    autor: Cadastro
     conteudo: str
-    anexos: list = field(default_factory=list)
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
     data_criacao: datetime = field(default_factory=datetime.now)

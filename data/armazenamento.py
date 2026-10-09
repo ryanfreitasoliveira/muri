@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime
 from models.topico import Topico
 from models.usuario import Cadastro
-
+from models.resposta import Resposta
 
 CAMINHO_BANCO = Path("dados/muri.db")
 
@@ -14,6 +14,7 @@ tem relação direta com a classe Topico. Já outras funções como listar_topic
 
 
 def criar_tabelas():
+    CAMINHO_BANCO.parent.mkdir(parents=True, exist_ok=True)
     conexao = sqlite3.connect(CAMINHO_BANCO)
     conexao.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -22,6 +23,15 @@ def criar_tabelas():
             sobrenome TEXT,
             username TEXT,
             tipo TEXT
+        )
+    """)
+    conexao.execute("""
+        CREATE TABLE IF NOT EXISTS respostas (
+            id TEXT PRIMARY KEY,
+            topico_id TEXT NOT NULL REFERENCES topicos(id),
+            autor_email TEXT REFERENCES usuarios(email),
+            conteudo TEXT NOT NULL,
+            data_criacao TEXT
         )
     """)
     conexao.execute("""
@@ -38,8 +48,8 @@ def criar_tabelas():
     """)
     conexao.commit()
     conexao.close()
-    
-#insere topico novo no banco de dados SQL
+
+# insere topico novo no banco de dados SQL
 def inserir_topico(novo_topico):
     conexao = sqlite3.connect(CAMINHO_BANCO)
     conexao.execute(
@@ -60,32 +70,78 @@ def inserir_topico(novo_topico):
     )
     conexao.commit()
     conexao.close()
-#ATENÇÃO: classe Usuario não adcionado
-"""def inserir_usuario(novo_usuario):
+
+
+def inserir_resposta(nova_resposta):
     conexao = sqlite3.connect(CAMINHO_BANCO)
     conexao.execute(
-        
-        #INSERT INTO topicos (email, nome, sobrenome, username, tipo)
-        #VALUES (?, ?, ?, ?, ?)
-        
+        """
+        INSERT INTO respostas (id, topico_id, autor_email, conteudo, data_criacao)
+        VALUES (?, ?, ?, ?, ?)
+        """,
         (
-            str(novo_usuario.nome),
-            novo_usuario.email,
-            novo_topico.sobrenome,
-            novo_topico.username,
+            str(nova_resposta.id),
+            str(nova_resposta.topico_id),
+            nova_resposta.autor.email,
+            nova_resposta.conteudo,
+            nova_resposta.data_criacao.isoformat(),
         ),
     )
     conexao.commit()
-    conexao.close()"""
-    
-#transforma as linhas salvas de volta em objetos do tipo 'Topico' e os armazena em uma lista
+    conexao.close()
+
+
+# ATENÇÃO: classe Usuario não adcionado
+def inserir_usuario(novo_usuario):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    conexao.execute(
+        """  INSERT OR IGNORE INTO usuarios (email, nome, sobrenome, username, tipo)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            novo_usuario.email,
+            novo_usuario.nome,
+            novo_usuario.sobrenome,
+            novo_usuario.username,
+            novo_usuario.tipo,
+        ),
+    )
+    conexao.commit()
+    conexao.close()
+
+
+def listar_respostas(id_topico):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    linhas = conexao.execute(
+        "SELECT * FROM respostas WHERE topico_id = ? ORDER BY data_criacao ASC",
+        (str(id_topico),),
+    ).fetchall()
+    conexao.close()
+    return [_linha_para_resposta(linha) for linha in linhas]
+
+def _linha_para_resposta(linha):
+    id_, topico_id, autor_email, conteudo, data_criacao = linha
+    return Resposta(
+        id=id_,
+        topico_id=topico_id,
+        autor=buscar_usuario(autor_email),
+        conteudo=conteudo,
+        data_criacao=datetime.fromisoformat(data_criacao),
+    )
+
+# transforma as linhas salvas de volta em objetos do tipo 'Topico' e os armazena em uma lista
 def listar_topicos():
     conexao = sqlite3.connect(CAMINHO_BANCO)
-    linhas = conexao.execute("SELECT * FROM topicos").fetchall()
+    linhas = conexao.execute("""
+        SELECT t.* FROM topicos t
+        ORDER BY COALESCE(
+            (SELECT MAX(r.data_criacao) FROM respostas r WHERE r.topico_id = t.id),
+            t.data_criacao
+        ) DESC
+    """).fetchall()
     conexao.close()
     return [_linha_para_topico(linha) for linha in linhas]
-
-#transforma uma linha da tabela usuario de volta em objeto do tipo 'Cadastro' atraves da chave primaria 'email'
+# transforma uma linha da tabela usuario de volta em objeto do tipo 'Cadastro' atraves da chave primaria 'email'
 def buscar_usuario(email):
     conexao = sqlite3.connect(CAMINHO_BANCO)
     linha = conexao.execute(
@@ -97,7 +153,7 @@ def buscar_usuario(email):
     email_, nome, sobrenome, username, tipo = linha
     return Cadastro(email=email_, nome=nome, sobrenome=sobrenome, username=username, tipo=tipo)
 
-#transforma uma linha da tabela topico de volta em objeto do tipo 'Topico'
+# transforma uma linha da tabela topico de volta em objeto do tipo 'Topico'
 def _linha_para_topico(linha):
     id_, titulo, autor_email, tags, mensagem, anexos, data_criacao, visualizacoes = linha
     return Topico(
@@ -110,7 +166,7 @@ def _linha_para_topico(linha):
         data_criacao=datetime.fromisoformat(data_criacao),
         visualizacoes=visualizacoes,
     )
-    
+
 
 def atualizar_visualizacoes(id_topico, novo_valor):
     conexao = sqlite3.connect(CAMINHO_BANCO)
@@ -120,8 +176,8 @@ def atualizar_visualizacoes(id_topico, novo_valor):
     )
     conexao.commit()
     conexao.close()
-    
-    
+
+
 def buscar_topico(id_topico):
     conexao = sqlite3.connect(CAMINHO_BANCO)
     linha = conexao.execute(

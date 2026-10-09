@@ -6,9 +6,9 @@ import uuid
 
 @dataclass
 class Topico:
-    id_: uuid.UUID = field(default_factory=uuid.uuid4)
     titulo: str
     autor: Cadastro
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
     tags: list = field(default_factory=list)
     mensagem: str = ""
     anexos: list = field(default_factory=list)

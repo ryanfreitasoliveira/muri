@@ -1,7 +1,11 @@
-
 from models.topico import Topico
 from utils.arquivos import gerar_nome_unico
-from data.armazenamento import atualizar_visualizacoes, buscar_topico, inserir_topico
+from data.armazenamento import atualizar_visualizacoes, buscar_topico, inserir_topico, buscar_usuario
+from models.resposta import Resposta
+from data.armazenamento import (
+    atualizar_visualizacoes, buscar_topico, buscar_usuario, inserir_topico,
+    inserir_resposta, listar_topicos, listar_respostas,
+)
 from pathlib import Path
 import shutil
 
@@ -9,6 +13,13 @@ TAGS_DISPONIVEIS = ["sisu", "matricula", "bolsas", "estagio", "RU"]
 EXTENSOES_VALIDAS = {".png", ".jpg", ".jpeg", ".mp4"}
 TAMANHO_MAXIMO = 25 * 1024 * 1024  # 25 MB em bytes
 PASTA_ANEXOS = Path("data/anexos")
+LIMITE_RESPOSTA = 2000
+
+
+def usuario_cadastrado(usuario):
+    """True só se há um usuário e o e-mail dele existe no banco."""
+
+    return usuario is not None and buscar_usuario(usuario.email) is not None
 
 
 def validar_titulo(titulo: str):
@@ -40,6 +51,9 @@ def validar_e_salvar_anexo(caminho_original: str):
 
 
 def criar_topico(usuario, titulo, tags, mensagem, caminho_anexo):
+    if not usuario_cadastrado(usuario):
+        return None, "É preciso estar cadastrado para criar um tópico"
+    
     erro = validar_titulo(titulo)
     if erro:
         return None, erro
@@ -70,3 +84,31 @@ def abrir_topico(id_topico):
     atualizar_visualizacoes(topico.id, topico.visualizacoes)
 
     return topico, None
+
+
+def validar_resposta(conteudo: str):
+    if not conteudo.strip():
+        return "Resposta vazia"
+    if len(conteudo) > LIMITE_RESPOSTA:
+        return "Limite de texto atingido"
+    return None
+
+
+def responder_topico(usuario, id_topico, conteudo):
+    if not usuario_cadastrado(usuario):
+        return None, "É preciso estar cadastrado para responder"
+
+    erro = validar_resposta(conteudo)
+    if erro:
+        return None, erro
+
+    if buscar_topico(id_topico) is None:
+        return None, "Este tópico não existe mais"
+
+    nova = Resposta(
+        topico_id=str(id_topico),
+        autor=usuario,
+        conteudo=conteudo.strip(),
+    )
+    inserir_resposta(nova)
+    return nova, None
