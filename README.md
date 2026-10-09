@@ -1,4 +1,3 @@
-````markdown
 <a id="topo"></a>
 <div align="center">
 
@@ -128,4 +127,4 @@ Feito por alunos da UFRPE 🎓
 [⬆ voltar ao topo](#topo)
 
 </div>
-```
+
