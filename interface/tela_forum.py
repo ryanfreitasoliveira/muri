@@ -1,17 +1,47 @@
 from textual import on
-from textual.app import App, ComposeResult
-from textual.screen import ModalScreen
+from textual.app import ComposeResult
+from textual.screen import ModalScreen, Screen
 from textual.containers import VerticalScroll, Horizontal, Vertical
 from textual.widgets import (
     Label, Button, TabbedContent, TabPane, Markdown, Collapsible,
-    Input, TextArea, Checkbox,
+    Input, TextArea, Checkbox, Header, Footer,
 )
 
 from features.forum import (
     TAGS_DISPONIVEIS, validar_titulo, validar_resposta, usuario_cadastrado,
     criar_topico, responder_topico, listar_topicos, listar_respostas, abrir_topico,
 )
-from models.usuario import Cadastro
+from features.perfil import PainelPerfil
+from data.armazenamento import deletar_usuario
+
+
+class ConfirmarExclusaoContaModal(ModalScreen[bool]):
+    """Confirmação antes de excluir permanentemente a conta."""
+    CSS = """
+    ConfirmarExclusaoContaModal { align: center middle; }
+    #caixa-exclusao { width: 62; height: auto; padding: 1 2; border: thick $error; background: $surface; }
+    #aviso-exclusao { height: auto; margin-bottom: 1; }
+    """
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="caixa-exclusao"):
+            yield Label("Excluir conta?")
+            yield Label(
+                "Esta ação é permanente. Sua conta, seus tópicos e os comentários "
+                "associados serão excluídos. Não será possível desfazer.",
+                id="aviso-exclusao", markup=False,
+            )
+            with Horizontal():
+                yield Button("Sim, excluir conta", variant="error", id="confirmar-exclusao")
+                yield Button("Cancelar", id="cancelar-exclusao")
+
+    @on(Button.Pressed, "#confirmar-exclusao")
+    def confirmar(self) -> None:
+        self.dismiss(True)
+
+    @on(Button.Pressed, "#cancelar-exclusao")
+    def cancelar(self) -> None:
+        self.dismiss(False)
 
 
 class SeletorTagsModal(ModalScreen[list[str] | None]):
@@ -141,7 +171,14 @@ class TopicoItem(Collapsible):
         )
 
                 
+        tags = Label(
+            "Tags: " + ", ".join(topico.tags) if topico.tags else "Sem tags",
+            markup=False,
+            classes="tags-topico",
+        )
+
         super().__init__(
+            tags,
             Label(
                 topico.mensagem or "(sem mensagem)",
                 markup=False,
@@ -188,53 +225,81 @@ class NovaRespostaModal(ModalScreen[str | None]):
         self.dismiss(texto)
 
 
-class MURI(App):
+class TelaForum(Screen):
+    """Tela principal, aberta DEPOIS do login/cadastro. Recebe o usuário logado."""
+    TITLE = "Muri.app"
     CSS = """
-    Input { width: 1fr; margin: 0 1; }
-    .pesquisa { height: 5; align: center middle; }
-    Button { margin: 0 1; }
-    TopicoItem { margin: 0 2; }
-    .tags-topico { color: $text-muted; margin: 0 1 1 2; }
-    .linha-comentarios { height: auto; align: left middle; }
-    .comentarios { width: 1fr; margin: 0 1; }
-    .lista-comentarios { height: auto; padding: 0 1; }
-    .comentario { height: auto; margin: 0 0 1 0; }
-    .autor-comentario { width: 20; color: $primary; text-style: bold; }
-    #lista_topicos { height: 1fr; }
-    CollapsibleTitle {background: transparent; }
-    CollapsibleTitle:hover {background: transparent; }
-    .texto-topico {margin-bottom: 2; }
-    .linha-comentarios {
-    height: auto; min-height: 3; align: left middle; }
-    .linha-comentarios Collapsible {height: auto; min-height: 3; margin: 0; padding: 0; }
-    .linha-comentarios CollapsibleTitle {height: 3; padding: 0 1; }
+    TelaForum Input { width: 1fr; margin: 0 1; }
+    TelaForum .pesquisa { height: 5; align: center middle; }
+    TelaForum Button { margin: 0 1; }
+    TelaForum TopicoItem { margin: 0 2; }
+    TelaForum .tags-topico { color: $text-muted; margin: 0 1 1 2; }
+    TelaForum .respostas { height: auto; max-height: 15; width: 1fr; margin: 0 1; }
+    TelaForum .comentario { height: auto; margin: 0 0 1 0; }
+    TelaForum .autor-comentario { width: 20; color: $primary; text-style: bold; }
+    TelaForum #lista_topicos { height: 1fr; }
+    TelaForum CollapsibleTitle { background: transparent; }
+    TelaForum CollapsibleTitle:hover { background: transparent; }
+    TelaForum .texto-topico { margin-bottom: 2; }
+    TelaForum .linha-comentarios { height: auto; min-height: 3; align: left middle; }
+    TelaForum .linha-comentarios Collapsible { height: auto; min-height: 3; margin: 0; padding: 0; }
+    TelaForum .linha-comentarios CollapsibleTitle { height: 3; padding: 0 1; }
     """
 
-    def __init__(self):
+    def __init__(self, usuario):
         super().__init__()
-        self.usuario_logado = Cadastro(
-            email="teste@ufrpe.br", nome="Teste", sobrenome="Provisório",
-            username="teste", tipo="universitario",
-        )
+        self.usuario_logado = usuario
         self.texto_busca = ""
         self.tags_filtro: list[str] = []
 
     def compose(self) -> ComposeResult:
-        with TabbedContent():
-            with TabPane("Perfil"):
-                yield Markdown("# Perfil\n\nÁrea de perfil em desenvolvimento.")
-            with TabPane("Forum"):
+        yield Header(show_clock=False)
+        with TabbedContent(initial="aba-forum"):
+            with TabPane("Fórum", id="aba-forum"):
                 with Horizontal(classes="pesquisa"):
                     yield Input(placeholder="Buscar tópicos, dúvidas, editais...", id="busca")
                     yield Button("Filtrar tags", id="filtrar-tags")
                     yield Button("Novo tópico", variant="primary", id="novo_topico")
                 yield Label("", id="filtros-ativos")
                 yield VerticalScroll(id="lista_topicos")
-            with TabPane("Agenda"):
+            with TabPane("Meus dados", id="aba-perfil"):
+                yield PainelPerfil(self.usuario_logado)
+            with TabPane("Agenda", id="aba-agenda"):
                 yield Markdown("# Agenda\n\nÁrea de agenda em desenvolvimento.")
+        yield Footer()
 
     def on_mount(self) -> None:
         self.carregar_topicos()
+
+    @on(TabbedContent.TabActivated)
+    def ao_trocar_aba(self) -> None:
+        # Ao abrir "Meus dados", recarrega os números (o usuário pode ter postado agora).
+        if self.query_one(TabbedContent).active == "aba-perfil":
+            self.query_one(PainelPerfil).atualizar()
+
+    @on(Button.Pressed, "#btn_sair")
+    def sair_da_conta(self) -> None:
+        self.app.usuario_logado = None
+        self.app.pop_screen()  # volta para o menu inicial (login/cadastro)
+
+    @on(Button.Pressed, "#btn_excluir_conta")
+    def solicitar_exclusao_conta(self) -> None:
+        self.app.push_screen(ConfirmarExclusaoContaModal(), self.ao_confirmar_exclusao_conta)
+
+    def ao_confirmar_exclusao_conta(self, confirmou: bool) -> None:
+        if not confirmou:
+            return
+        try:
+            excluida = deletar_usuario(self.usuario_logado.email)
+        except Exception as erro:
+            self.notify(f"Não foi possível excluir a conta: {erro}", severity="error")
+            return
+        if not excluida:
+            self.notify("A conta não foi encontrada.", severity="error")
+            return
+        self.app.usuario_logado = None
+        self.app.pop_screen()
+        self.notify("Conta excluída com sucesso.")
 
     @on(Input.Changed, "#busca")
     def ao_pesquisar(self, event: Input.Changed) -> None:
@@ -243,7 +308,7 @@ class MURI(App):
 
     @on(Button.Pressed, "#filtrar-tags")
     def abrir_filtro_tags(self) -> None:
-        self.push_screen(SeletorTagsModal(self.tags_filtro, "Filtrar por tags"), self.aplicar_filtro_tags)
+        self.app.push_screen(SeletorTagsModal(self.tags_filtro, "Filtrar por tags"), self.aplicar_filtro_tags)
 
     def aplicar_filtro_tags(self, tags: list[str] | None) -> None:
         if tags is None:
@@ -315,7 +380,7 @@ class MURI(App):
             self.notify("Cadastre-se para comentar", severity="warning")
             return
         topico_id = event.button.topico_id
-        self.push_screen(NovaRespostaModal(), lambda texto: self.ao_fechar_resposta(texto, topico_id))
+        self.app.push_screen(NovaRespostaModal(), lambda texto: self.ao_fechar_resposta(texto, topico_id))
 
     def ao_fechar_resposta(self, texto, topico_id) -> None:
         if texto is None:
@@ -326,8 +391,9 @@ class MURI(App):
             return
         item = self.achar_item(topico_id)
         if item:
+            item.title = montar_titulo_topico(item.topico)
             self.carregar_respostas(item)
-            item.comentarios.collapsed = False
+            item.colapsavel_comentarios.collapsed = False
         self.notify("Comentário adicionado!")
 
     @on(Button.Pressed, "#novo_topico")
@@ -335,7 +401,7 @@ class MURI(App):
         if not usuario_cadastrado(self.usuario_logado):
             self.notify("Cadastre-se para criar um tópico", severity="warning")
             return
-        self.push_screen(NovoTopicoModal(), self.ao_fechar_modal)
+        self.app.push_screen(NovoTopicoModal(), self.ao_fechar_modal)
 
     def ao_fechar_modal(self, dados: dict | None) -> None:
         if dados is None:

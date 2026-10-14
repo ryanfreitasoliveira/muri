@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from models.usuario import Cadastro
 from datetime import datetime
-from models.resposta import Resposta
 import uuid
 
 @dataclass

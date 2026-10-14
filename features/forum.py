@@ -1,18 +1,18 @@
-from models.topico import Topico
-from utils.arquivos import gerar_nome_unico
-from data.armazenamento import atualizar_visualizacoes, buscar_topico, inserir_topico, buscar_usuario
-from models.resposta import Resposta
-from data.armazenamento import (
-    atualizar_visualizacoes, buscar_topico, buscar_usuario, inserir_topico,
-    inserir_resposta, listar_topicos, listar_respostas,
-)
 from pathlib import Path
 import shutil
+
+from data.armazenamento import (
+    BASE_DIR, atualizar_visualizacoes, buscar_topico, buscar_usuario, inserir_topico,
+    inserir_resposta, listar_topicos, listar_respostas,
+)
+from models.resposta import Resposta
+from models.topico import Topico
+from utils.arquivos import gerar_nome_unico
 
 TAGS_DISPONIVEIS = ["sisu", "matricula", "bolsas", "estagio", "RU"]
 EXTENSOES_VALIDAS = {".png", ".jpg", ".jpeg", ".mp4"}
 TAMANHO_MAXIMO = 25 * 1024 * 1024  # 25 MB em bytes
-PASTA_ANEXOS = Path("data/anexos")
+PASTA_ANEXOS = BASE_DIR / "data" / "anexos"
 LIMITE_RESPOSTA = 2000
 
 
@@ -23,19 +23,30 @@ def usuario_cadastrado(usuario):
 
 
 def validar_titulo(titulo: str):
-    
+
     if not titulo.strip():
         return "Título vazio"
-    
+
     if len(titulo) > 300:
         return "Limite de texto atingido"
-    
+
+    return None
+
+
+def validar_resposta(conteudo: str):
+    if not conteudo.strip():
+        return "Resposta vazia"
+    if len(conteudo) > LIMITE_RESPOSTA:
+        return "Limite de texto atingido"
     return None
 
 
 def validar_e_salvar_anexo(caminho_original: str):
 
-    caminho = Path(caminho_original)
+    caminho = Path(caminho_original.strip().strip('"'))
+
+    if not caminho.is_file():
+        return None, "Arquivo não encontrado"
 
     if caminho.suffix.lower() not in EXTENSOES_VALIDAS:
         return None, "Formato de arquivo não suportado"
@@ -43,7 +54,8 @@ def validar_e_salvar_anexo(caminho_original: str):
     if caminho.stat().st_size > TAMANHO_MAXIMO:
         return None, "Arquivo maior que o limite permitido (máx. 25 MB)"
 
-    novo_nome = gerar_nome_unico(caminho_original)
+    PASTA_ANEXOS.mkdir(parents=True, exist_ok=True)
+    novo_nome = gerar_nome_unico(str(caminho))
     destino = PASTA_ANEXOS / novo_nome
     shutil.copy(caminho, destino)
 
@@ -77,21 +89,13 @@ def criar_topico(usuario, titulo, tags, mensagem, caminho_anexo):
 
 def abrir_topico(id_topico):
     topico = buscar_topico(id_topico)
-    if topico == None:
+    if topico is None:
         return None, "Este tópico não existe mais"
 
     topico.incrementar_visualizacao()
     atualizar_visualizacoes(topico.id, topico.visualizacoes)
 
     return topico, None
-
-
-def validar_resposta(conteudo: str):
-    if not conteudo.strip():
-        return "Resposta vazia"
-    if len(conteudo) > LIMITE_RESPOSTA:
-        return "Limite de texto atingido"
-    return None
 
 
 def responder_topico(usuario, id_topico, conteudo):
