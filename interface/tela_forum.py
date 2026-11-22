@@ -3,20 +3,40 @@ from textual.app import ComposeResult
 from textual.screen import ModalScreen, Screen
 from textual.containers import VerticalScroll, Horizontal, Vertical
 from textual.widgets import (
-    Label, Button, TabbedContent, TabPane, Markdown, Collapsible,
-    Input, TextArea, Checkbox, Header, Footer,
+    Label,
+    Button,
+    TabbedContent,
+    TabPane,
+    Markdown,
+    Collapsible,
+    Input,
+    TextArea,
+    Checkbox,
+    Header,
+    Footer,
 )
 
 from features.forum import (
-    TAGS_DISPONIVEIS, validar_titulo, validar_resposta, usuario_cadastrado,
-    criar_topico, responder_topico, listar_topicos, listar_respostas, abrir_topico,
+    TAGS_DISPONIVEIS,
+    validar_titulo,
+    validar_resposta,
+    usuario_cadastrado,
+    criar_topico,
+    responder_topico,
+    listar_topicos,
+    listar_respostas,
+    abrir_topico,
+    excluir_topico,
+    excluir_resposta,
 )
-from features.perfil import PainelPerfil
+from features.gamificacao import icone_badge_ativa, verificar_gamificacao
+from interface.tela_perfil import PainelPerfil
 from data.armazenamento import deletar_usuario
 
 
 class ConfirmarExclusaoContaModal(ModalScreen[bool]):
     """Confirmação antes de excluir permanentemente a conta."""
+
     CSS = """
     ConfirmarExclusaoContaModal { align: center middle; }
     #caixa-exclusao { width: 62; height: auto; padding: 1 2; border: thick $error; background: $surface; }
@@ -29,10 +49,13 @@ class ConfirmarExclusaoContaModal(ModalScreen[bool]):
             yield Label(
                 "Esta ação é permanente. Sua conta, seus tópicos e os comentários "
                 "associados serão excluídos. Não será possível desfazer.",
-                id="aviso-exclusao", markup=False,
+                id="aviso-exclusao",
+                markup=False,
             )
             with Horizontal():
-                yield Button("Sim, excluir conta", variant="error", id="confirmar-exclusao")
+                yield Button(
+                    "Sim, excluir conta", variant="error", id="confirmar-exclusao"
+                )
                 yield Button("Cancelar", id="cancelar-exclusao")
 
     @on(Button.Pressed, "#confirmar-exclusao")
@@ -46,13 +69,16 @@ class ConfirmarExclusaoContaModal(ModalScreen[bool]):
 
 class SeletorTagsModal(ModalScreen[list[str] | None]):
     """Permite selecionar várias tags, tanto na criação quanto no filtro."""
+
     CSS = """
     SeletorTagsModal { align: center middle; }
     #caixa-tags { width: 50; height: auto; max-height: 85%; padding: 1 2; border: thick $primary; background: $surface; }
     #opcoes-tags { height: auto; max-height: 20; }
     """
 
-    def __init__(self, selecionadas: list[str] | None = None, titulo: str = "Selecione as tags"):
+    def __init__(
+        self, selecionadas: list[str] | None = None, titulo: str = "Selecione as tags"
+    ):
         super().__init__()
         self.selecionadas = set(selecionadas or [])
         self.titulo = titulo
@@ -69,7 +95,11 @@ class SeletorTagsModal(ModalScreen[list[str] | None]):
 
     @on(Button.Pressed, "#confirmar-tags")
     def confirmar(self) -> None:
-        escolhidas = [tag for tag in TAGS_DISPONIVEIS if self.query_one(f"#tag-{tag}", Checkbox).value]
+        escolhidas = [
+            tag
+            for tag in TAGS_DISPONIVEIS
+            if self.query_one(f"#tag-{tag}", Checkbox).value
+        ]
         self.dismiss(escolhidas)
 
     @on(Button.Pressed, "#cancelar-tags")
@@ -98,7 +128,9 @@ class NovoTopicoModal(ModalScreen[dict | None]):
                 yield Label("Nenhuma tag selecionada", id="tags-escolhidas")
             yield TextArea(id="mensagem", language=None)
             yield Input(placeholder="Caminho do anexo (opcional)", id="anexo")
-            yield Label("Você pode usar Markdown: # título, **negrito**, listas e links.")
+            yield Label(
+                "Você pode usar Markdown: # título, **negrito**, listas e links."
+            )
             yield Label("", id="erro")
             with Horizontal():
                 yield Button("Criar", variant="primary", id="criar")
@@ -106,7 +138,10 @@ class NovoTopicoModal(ModalScreen[dict | None]):
 
     @on(Button.Pressed, "#escolher-tags")
     def abrir_seletor_tags(self) -> None:
-        self.app.push_screen(SeletorTagsModal(self.tags_escolhidas, "Tags do tópico"), self.atualizar_tags)
+        self.app.push_screen(
+            SeletorTagsModal(self.tags_escolhidas, "Tags do tópico"),
+            self.atualizar_tags,
+        )
 
     def atualizar_tags(self, tags: list[str] | None) -> None:
         if tags is not None:
@@ -125,12 +160,41 @@ class NovoTopicoModal(ModalScreen[dict | None]):
         if erro:
             self.query_one("#erro", Label).update(erro)
             return
-        self.dismiss({
-            "titulo": titulo,
-            "tags": self.tags_escolhidas,
-            "mensagem": self.query_one("#mensagem", TextArea).text,
-            "anexo": self.query_one("#anexo", Input).value,
-        })
+        self.dismiss(
+            {
+                "titulo": titulo,
+                "tags": self.tags_escolhidas,
+                "mensagem": self.query_one("#mensagem", TextArea).text,
+                "anexo": self.query_one("#anexo", Input).value,
+            }
+        )
+
+
+class ConfirmarModal(ModalScreen[bool]):
+    CSS = """
+    ConfirmarModal { align: center middle; }
+    #caixa-confirmar { width: 60; height: auto; padding: 1 2; border: thick $error; background: $surface; }
+    #texto-confirmar { height: auto; margin-bottom: 1; }
+    """
+
+    def __init__(self, pergunta: str):
+        super().__init__()
+        self.pergunta = pergunta
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="caixa-confirmar"):
+            yield Label(self.pergunta, id="texto-confirmar", markup=False)
+            with Horizontal():
+                yield Button("Excluir", variant="error", id="confirmar-sim")
+                yield Button("Cancelar", id="confirmar-nao")
+
+    @on(Button.Pressed, "#confirmar-sim")
+    def sim(self) -> None:
+        self.dismiss(True)
+
+    @on(Button.Pressed, "#confirmar-nao")
+    def nao(self) -> None:
+        self.dismiss(False)
 
 
 class BotaoResponder(Button):
@@ -139,44 +203,45 @@ class BotaoResponder(Button):
         self.topico_id = str(topico_id)
 
 
-def montar_titulo_topico(topico):
-    autor = topico.autor.username if topico.autor else "desconhecido"
+class BotaoExcluirTopico(Button):
+    def __init__(self, topico_id):
+        super().__init__("Excluir tópico", variant="error", classes="excluir-topico")
+        self.topico_id = str(topico_id)
 
-    visualizacoes = getattr(topico, "visualizacoes", 0)
+
+class BotaoExcluirComentario(Button):
+    def __init__(self, resposta_id, topico_id):
+        super().__init__("Excluir", variant="error", classes="excluir-comentario")
+        self.resposta_id = str(resposta_id)
+        self.topico_id = str(topico_id)
+
+
+def autor_com_badge(item) -> str:
+    if not item.autor:
+        return "desconhecido"
+    return f"{item.autor.username} {icone_badge_ativa(item.autor.email)}".strip()
+
+
+def montar_titulo_topico(topico) -> str:
     total_comentarios = len(listar_respostas(topico.id))
-
-    return (
-        f"{autor} | {topico.titulo}"
-        f"    👁 {visualizacoes}"
-        f"    💬 {total_comentarios}"
-    )
+    return f"{autor_com_badge(topico)} | {topico.titulo}    👁 {topico.visualizacoes}    💬 {total_comentarios}"
 
 
 class TopicoItem(Collapsible):
     """Colapsável do tópico com estatísticas e comentários."""
 
-    def __init__(self, topico):
+    def __init__(self, topico, pode_excluir: bool = False):
         caixa = VerticalScroll(classes="respostas")
-
-        comentarios = Collapsible(
-            caixa,
-            title="Comentarios:",
-            collapsed=True,
-        )
-
-        with_botoes = Horizontal(
-            comentarios,
-            BotaoResponder(topico.id),
-            classes="linha-comentarios",
-        )
-
-                
+        comentarios = Collapsible(caixa, title="Comentarios:", collapsed=True)
+        botoes = [comentarios, BotaoResponder(topico.id)]
+        if pode_excluir:
+            botoes.append(BotaoExcluirTopico(topico.id))
+        linha = Horizontal(*botoes, classes="linha-comentarios")
         tags = Label(
             "Tags: " + ", ".join(topico.tags) if topico.tags else "Sem tags",
             markup=False,
             classes="tags-topico",
         )
-
         super().__init__(
             tags,
             Label(
@@ -184,12 +249,10 @@ class TopicoItem(Collapsible):
                 markup=False,
                 classes="texto-topico",
             ),
-            with_botoes,
+            linha,
             title=montar_titulo_topico(topico),
             collapsed=True,
         )
-        
-        
         self.topico = topico
         self.caixa_respostas = caixa
         self.colapsavel_comentarios = comentarios
@@ -227,6 +290,7 @@ class NovaRespostaModal(ModalScreen[str | None]):
 
 class TelaForum(Screen):
     """Tela principal, aberta DEPOIS do login/cadastro. Recebe o usuário logado."""
+
     TITLE = "Muri.app"
     CSS = """
     TelaForum Input { width: 1fr; margin: 0 1; }
@@ -236,6 +300,8 @@ class TelaForum(Screen):
     TelaForum .tags-topico { color: $text-muted; margin: 0 1 1 2; }
     TelaForum .respostas { height: auto; max-height: 15; width: 1fr; margin: 0 1; }
     TelaForum .comentario { height: auto; margin: 0 0 1 0; }
+    TelaForum .comentario Markdown { width: 1fr; }
+    TelaForum .excluir-comentario { min-width: 10; }
     TelaForum .autor-comentario { width: 20; color: $primary; text-style: bold; }
     TelaForum #lista_topicos { height: 1fr; }
     TelaForum CollapsibleTitle { background: transparent; }
@@ -257,7 +323,9 @@ class TelaForum(Screen):
         with TabbedContent(initial="aba-forum"):
             with TabPane("Fórum", id="aba-forum"):
                 with Horizontal(classes="pesquisa"):
-                    yield Input(placeholder="Buscar tópicos, dúvidas, editais...", id="busca")
+                    yield Input(
+                        placeholder="Buscar tópicos, dúvidas, editais...", id="busca"
+                    )
                     yield Button("Filtrar tags", id="filtrar-tags")
                     yield Button("Novo tópico", variant="primary", id="novo_topico")
                 yield Label("", id="filtros-ativos")
@@ -270,21 +338,36 @@ class TelaForum(Screen):
 
     def on_mount(self) -> None:
         self.carregar_topicos()
+        self.conferir_gamificacao()
+
+    def conferir_gamificacao(self) -> None:
+        for aviso in verificar_gamificacao(self.usuario_logado):
+            self.notify(aviso, title="Gamificação")
 
     @on(TabbedContent.TabActivated)
     def ao_trocar_aba(self) -> None:
-        # Ao abrir "Meus dados", recarrega os números (o usuário pode ter postado agora).
-        if self.query_one(TabbedContent).active == "aba-perfil":
+        aba = self.query_one(TabbedContent).active
+        if aba == "aba-perfil":
+            self.conferir_gamificacao()
             self.query_one(PainelPerfil).atualizar()
+        elif aba == "aba-forum":
+            self.carregar_topicos()
+
+    @on(PainelPerfil.PerfilAtualizado)
+    def ao_atualizar_perfil(self, event: PainelPerfil.PerfilAtualizado) -> None:
+        self.usuario_logado = event.usuario
+        self.app.usuario_logado = event.usuario
 
     @on(Button.Pressed, "#btn_sair")
     def sair_da_conta(self) -> None:
         self.app.usuario_logado = None
-        self.app.pop_screen()  # volta para o menu inicial (login/cadastro)
+        self.app.pop_screen()
 
     @on(Button.Pressed, "#btn_excluir_conta")
     def solicitar_exclusao_conta(self) -> None:
-        self.app.push_screen(ConfirmarExclusaoContaModal(), self.ao_confirmar_exclusao_conta)
+        self.app.push_screen(
+            ConfirmarExclusaoContaModal(), self.ao_confirmar_exclusao_conta
+        )
 
     def ao_confirmar_exclusao_conta(self, confirmou: bool) -> None:
         if not confirmou:
@@ -308,27 +391,39 @@ class TelaForum(Screen):
 
     @on(Button.Pressed, "#filtrar-tags")
     def abrir_filtro_tags(self) -> None:
-        self.app.push_screen(SeletorTagsModal(self.tags_filtro, "Filtrar por tags"), self.aplicar_filtro_tags)
+        self.app.push_screen(
+            SeletorTagsModal(self.tags_filtro, "Filtrar por tags"),
+            self.aplicar_filtro_tags,
+        )
 
     def aplicar_filtro_tags(self, tags: list[str] | None) -> None:
         if tags is None:
             return
         self.tags_filtro = tags
-        texto = "Filtros: " + (", ".join(tags) if tags else "nenhum")
-        self.query_one("#filtros-ativos", Label).update(texto)
+        self.query_one("#filtros-ativos", Label).update(
+            "Filtros: " + (", ".join(tags) if tags else "nenhum")
+        )
         self.carregar_topicos()
 
     def carregar_topicos(self) -> None:
         lista = self.query_one("#lista_topicos", VerticalScroll)
         lista.remove_children()
+        email = self.usuario_logado.email
         for topico in listar_topicos():
-            autor = topico.autor.username if topico.autor else "desconhecido"
-            campos = " ".join([topico.titulo, topico.mensagem or "", autor, " ".join(topico.tags)]).casefold()
+            campos = " ".join(
+                [
+                    topico.titulo,
+                    topico.mensagem or "",
+                    autor_com_badge(topico),
+                    " ".join(topico.tags),
+                ]
+            ).casefold()
             if self.texto_busca and self.texto_busca not in campos:
                 continue
             if self.tags_filtro and not set(self.tags_filtro).intersection(topico.tags):
                 continue
-            lista.mount(TopicoItem(topico))
+            pode_excluir = bool(topico.autor and topico.autor.email == email)
+            lista.mount(TopicoItem(topico, pode_excluir))
 
     def carregar_respostas(self, item: TopicoItem) -> None:
         caixa = item.caixa_respostas
@@ -337,14 +432,19 @@ class TelaForum(Screen):
         if not respostas:
             caixa.mount(Label("Nenhum comentário ainda."))
             return
+        email = self.usuario_logado.email
         for resposta in respostas:
-            autor = resposta.autor.username if resposta.autor else "desconhecido"
-            with_box = Horizontal(
-                Label(autor, classes="autor-comentario"),
+            partes = [
+                Label(
+                    autor_com_badge(resposta),
+                    classes="autor-comentario",
+                    markup=False,
+                ),
                 Markdown(resposta.conteudo or "*(comentário vazio)*"),
-                classes="comentario",
-            )
-            caixa.mount(with_box)
+            ]
+            if resposta.autor and resposta.autor.email == email:
+                partes.append(BotaoExcluirComentario(resposta.id, item.topico.id))
+            caixa.mount(Horizontal(*partes, classes="comentario"))
 
     def achar_item(self, topico_id):
         for item in self.query(TopicoItem):
@@ -352,26 +452,24 @@ class TelaForum(Screen):
                 return item
         return None
 
-    @on(Collapsible.Expanded)
-    def ao_expandir(self, event: Collapsible.Expanded):
-        item = event.collapsible
+    def atualizar_item(self, topico_id):
+        item = self.achar_item(topico_id)
+        if item:
+            item.title = montar_titulo_topico(item.topico)
+            self.carregar_respostas(item)
+        return item
 
+    @on(Collapsible.Expanded)
+    def ao_expandir(self, event: Collapsible.Expanded) -> None:
+        item = event.collapsible
         if not isinstance(item, TopicoItem):
             return
-
         topico_aberto, erro = abrir_topico(item.topico.id)
-
         if erro:
             self.notify(erro, severity="error")
             return
-
-        # Atualiza os dados do tópico com os valores do banco.
         item.topico = topico_aberto
-
-        # Atualiza o título com a visualização mais recente
-        # e a quantidade atual de comentários.
-        item.title = montar_titulo_topico(item.topico)
-
+        item.title = montar_titulo_topico(topico_aberto)
         self.carregar_respostas(item)
 
     @on(Button.Pressed, ".responder")
@@ -380,7 +478,9 @@ class TelaForum(Screen):
             self.notify("Cadastre-se para comentar", severity="warning")
             return
         topico_id = event.button.topico_id
-        self.app.push_screen(NovaRespostaModal(), lambda texto: self.ao_fechar_resposta(texto, topico_id))
+        self.app.push_screen(
+            NovaRespostaModal(), lambda texto: self.ao_fechar_resposta(texto, topico_id)
+        )
 
     def ao_fechar_resposta(self, texto, topico_id) -> None:
         if texto is None:
@@ -389,12 +489,56 @@ class TelaForum(Screen):
         if erro:
             self.notify(erro, severity="error")
             return
-        item = self.achar_item(topico_id)
+        item = self.atualizar_item(topico_id)
         if item:
-            item.title = montar_titulo_topico(item.topico)
-            self.carregar_respostas(item)
             item.colapsavel_comentarios.collapsed = False
         self.notify("Comentário adicionado!")
+        self.conferir_gamificacao()
+
+    @on(Button.Pressed, ".excluir-topico")
+    def pedir_exclusao_topico(self, event: Button.Pressed) -> None:
+        event.stop()
+        topico_id = event.button.topico_id
+        self.app.push_screen(
+            ConfirmarModal(
+                "Excluir este tópico? Os comentários dele também serão apagados."
+            ),
+            lambda ok: self.ao_confirmar_exclusao_topico(ok, topico_id),
+        )
+
+    def ao_confirmar_exclusao_topico(self, confirmou: bool, topico_id) -> None:
+        if not confirmou:
+            return
+        _, erro = excluir_topico(self.usuario_logado, topico_id)
+        if erro:
+            self.notify(erro, severity="error")
+            return
+        self.notify("Tópico excluído.")
+        self.carregar_topicos()
+
+    @on(Button.Pressed, ".excluir-comentario")
+    def pedir_exclusao_comentario(self, event: Button.Pressed) -> None:
+        event.stop()
+        resposta_id = event.button.resposta_id
+        topico_id = event.button.topico_id
+        self.app.push_screen(
+            ConfirmarModal("Excluir este comentário?"),
+            lambda ok: self.ao_confirmar_exclusao_comentario(
+                ok, resposta_id, topico_id
+            ),
+        )
+
+    def ao_confirmar_exclusao_comentario(
+        self, confirmou: bool, resposta_id, topico_id
+    ) -> None:
+        if not confirmou:
+            return
+        _, erro = excluir_resposta(self.usuario_logado, resposta_id)
+        if erro:
+            self.notify(erro, severity="error")
+            return
+        self.notify("Comentário excluído.")
+        self.atualizar_item(topico_id)
 
     @on(Button.Pressed, "#novo_topico")
     def abrir_novo_topico(self) -> None:
@@ -407,11 +551,15 @@ class TelaForum(Screen):
         if dados is None:
             return
         _, erro = criar_topico(
-            self.usuario_logado, dados["titulo"], dados["tags"],
-            dados["mensagem"], dados["anexo"],
+            self.usuario_logado,
+            dados["titulo"],
+            dados["tags"],
+            dados["mensagem"],
+            dados["anexo"],
         )
         if erro:
             self.notify(erro, severity="error")
             return
         self.notify("Tópico criado!")
         self.carregar_topicos()
+        self.conferir_gamificacao()

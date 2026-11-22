@@ -213,6 +213,8 @@ def deletar_usuario(email):
             "(SELECT id FROM topicos WHERE autor_email = ?)", (email,)
         )
         conexao.execute("DELETE FROM topicos WHERE autor_email = ?", (email,))
+        for tabela in ("badges_usuarios", "badge_ativa", "missao_diaria"):
+            conexao.execute(f"DELETE FROM {tabela} WHERE email = ?", (email,))
         cursor = conexao.execute("DELETE FROM usuarios WHERE email = ?", (email,))
         conexao.commit()
         return cursor.rowcount > 0
@@ -221,3 +223,96 @@ def deletar_usuario(email):
         raise
     finally:
         conexao.close()
+
+
+def atualizar_usuario(email_antigo, usuario):
+    """Atualiza o usuário e propaga o novo e-mail para tópicos e respostas."""
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        cursor = conexao.execute(
+            """
+            UPDATE usuarios
+            SET email = ?, nome = ?, sobrenome = ?, username = ?, tipo = ?, senha = ?
+            WHERE email = ?
+            """,
+            (
+                usuario.email,
+                usuario.nome,
+                usuario.sobrenome,
+                usuario.username,
+                usuario.tipo,
+                usuario.senha,
+                email_antigo,
+            ),
+        )
+        if cursor.rowcount == 0:
+            conexao.rollback()
+            return False
+        if usuario.email != email_antigo:
+            conexao.execute(
+                "UPDATE topicos SET autor_email = ? WHERE autor_email = ?",
+                (usuario.email, email_antigo),
+            )
+            conexao.execute(
+                "UPDATE respostas SET autor_email = ? WHERE autor_email = ?",
+                (usuario.email, email_antigo),
+            )
+            for tabela in ("badges_usuarios", "badge_ativa", "missao_diaria"):
+                conexao.execute(
+                    f"UPDATE {tabela} SET email = ? WHERE email = ?",
+                    (usuario.email, email_antigo),
+                )
+        conexao.commit()
+        return True
+    except sqlite3.IntegrityError:
+        conexao.rollback()
+        return False
+    finally:
+        conexao.close()
+
+
+def deletar_topico(id_topico):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        conexao.execute("DELETE FROM respostas WHERE topico_id = ?", (str(id_topico),))
+        cursor = conexao.execute("DELETE FROM topicos WHERE id = ?", (str(id_topico),))
+        conexao.commit()
+        return cursor.rowcount > 0
+    except Exception:
+        conexao.rollback()
+        raise
+    finally:
+        conexao.close()
+
+
+def buscar_resposta(id_resposta):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    linha = conexao.execute(
+        "SELECT * FROM respostas WHERE id = ?", (str(id_resposta),)
+    ).fetchone()
+    conexao.close()
+    return _linha_para_resposta(linha) if linha else None
+
+
+def deletar_resposta(id_resposta):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conexao.execute("DELETE FROM respostas WHERE id = ?", (str(id_resposta),))
+    conexao.commit()
+    conexao.close()
+    return cursor.rowcount > 0
+
+
+def listar_respostas_do_usuario(email):
+    """Retorna (id_resposta, titulo_do_topico, conteudo), da mais recente para a mais antiga."""
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    linhas = conexao.execute(
+        """
+        SELECT r.id, t.titulo, r.conteudo
+        FROM respostas r JOIN topicos t ON t.id = r.topico_id
+        WHERE r.autor_email = ?
+        ORDER BY r.data_criacao DESC
+        """,
+        (email,),
+    ).fetchall()
+    conexao.close()
+    return linhas

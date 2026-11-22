@@ -2,8 +2,17 @@ from pathlib import Path
 import shutil
 
 from data.armazenamento import (
-    BASE_DIR, atualizar_visualizacoes, buscar_topico, buscar_usuario, inserir_topico,
-    inserir_resposta, listar_topicos, listar_respostas,
+    BASE_DIR,
+    atualizar_visualizacoes,
+    buscar_topico,
+    buscar_usuario,
+    inserir_topico,
+    inserir_resposta,
+    listar_topicos,
+    listar_respostas,
+    deletar_topico,
+    buscar_resposta,
+    deletar_resposta,  
 )
 from models.resposta import Resposta
 from models.topico import Topico
@@ -116,3 +125,38 @@ def responder_topico(usuario, id_topico, conteudo):
     )
     inserir_resposta(nova)
     return nova, None
+
+
+def excluir_topico(usuario, id_topico):
+    if not usuario_cadastrado(usuario):
+        return False, "É preciso estar cadastrado para excluir um tópico"
+
+    topico = buscar_topico(id_topico)
+    if topico is None:
+        return False, "Este tópico não existe mais"
+
+    if topico.autor is None or topico.autor.email != usuario.email:
+        return False, "Você só pode excluir os seus próprios tópicos"
+
+    if not deletar_topico(topico.id):
+        return False, "Não foi possível excluir o tópico"
+
+    for anexo in topico.anexos:  # remove os arquivos do disco também
+        Path(anexo).unlink(missing_ok=True)
+    return True, None
+
+
+def excluir_resposta(usuario, id_resposta):
+    if not usuario_cadastrado(usuario):
+        return False, "É preciso estar cadastrado para excluir um comentário"
+
+    resposta = buscar_resposta(id_resposta)
+    if resposta is None:
+        return False, "Este comentário não existe mais"
+
+    if resposta.autor is None or resposta.autor.email != usuario.email:
+        return False, "Você só pode excluir os seus próprios comentários"
+
+    if not deletar_resposta(resposta.id):
+        return False, "Não foi possível excluir o comentário"
+    return True, None
