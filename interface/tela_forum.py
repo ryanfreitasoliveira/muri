@@ -30,6 +30,7 @@ from features.forum import (
     excluir_resposta,
 )
 from features.gamificacao import icone_badge_ativa, verificar_gamificacao
+from interface.painel_mapa import PainelMapa
 from interface.tela_perfil import PainelPerfil
 from data.armazenamento import deletar_usuario
 
@@ -332,6 +333,8 @@ class TelaForum(Screen):
                 yield VerticalScroll(id="lista_topicos")
             with TabPane("Meus dados", id="aba-perfil"):
                 yield PainelPerfil(self.usuario_logado)
+            with TabPane("Mapa", id="aba-mapa"):
+                yield PainelMapa()
             with TabPane("Agenda", id="aba-agenda"):
                 yield Markdown("# Agenda\n\nÁrea de agenda em desenvolvimento.")
         yield Footer()

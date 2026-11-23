@@ -29,6 +29,13 @@ def carregar_categorias() -> dict:
     return _ler_arquivo()["categorias"]
 
 
+FILTRO_QUALQUER = "qualquer"
+
+
+def carregar_recursos_acessibilidade() -> dict:
+    return _ler_arquivo().get("recursos_acessibilidade", {})
+
+
 # ---------- aberto ou fechado ----------
 
 
@@ -65,18 +72,76 @@ def ponto_corresponde(ponto: dict, busca: str) -> bool:
     return any(busca in normalizar(termo) for termo in termos)
 
 
-def filtrar_locais(busca: str) -> list[dict]:
-    """Sem busca, devolve todos. Com busca, só os locais cujo nome ou algum ponto-chave bate."""
+def filtrar_locais(busca: str, acessibilidade: str = "todos") -> list[dict]:
     busca = normalizar(busca)
     locais = carregar_locais()
+
+    if acessibilidade == "elevador":
+        locais = [l for l in locais if l.get("elevador")]
+    elif acessibilidade == "vagas":
+        locais = [l for l in locais if l.get("vagas_exclusivas")]
+
     if not busca:
         return locais
     return [
-        local
-        for local in locais
-        if busca in normalizar(local["nome"])
-        or any(ponto_corresponde(p, busca) for p in local["pontos_chave"])
+        l
+        for l in locais
+        if busca in normalizar(l["nome"])
+        or any(ponto_corresponde(p, busca) for p in l["pontos_chave"])
     ]
+
+
+# ---------- acessibilidade ----------
+
+
+def _recursos_do_local(local: dict) -> list[dict]:
+    catalogo = carregar_recursos_acessibilidade()
+    return [
+        item
+        for item in local.get("acessibilidade", [])
+        if item.get("recurso") in catalogo
+    ]
+
+
+def local_acessivel(local: dict) -> bool:
+    return bool(_recursos_do_local(local))
+
+
+def possui_recurso(local: dict, recurso: str = "") -> bool:
+    if not recurso:
+        return True
+    itens = _recursos_do_local(local)
+    if recurso == FILTRO_QUALQUER:
+        return bool(itens)
+    return any(item["recurso"] == recurso for item in itens)
+
+
+def listar_acessibilidade(local: dict, recurso: str = "") -> list[dict]:
+    """Cada item devolvido tem: texto, destaque (é o recurso filtrado) e indisponivel."""
+    catalogo = carregar_recursos_acessibilidade()
+    resultado = []
+    for item in _recursos_do_local(local):
+        texto = catalogo[item["recurso"]]["nome"]
+        if item.get("onde"):
+            texto += f": {item['onde']}"
+        indisponivel = bool(item.get("indisponivel"))
+        if indisponivel:
+            texto += " · Indisponível no momento"
+        resultado.append(
+            {
+                "texto": texto,
+                "destaque": item["recurso"] == recurso,
+                "indisponivel": indisponivel,
+            }
+        )
+    return resultado
+
+
+def opcoes_filtro_acessibilidade() -> list[tuple[str, str]]:
+    opcoes = [("Todos os locais", ""), ("Somente locais acessíveis", FILTRO_QUALQUER)]
+    for chave, info in carregar_recursos_acessibilidade().items():
+        opcoes.append((f"Com {info['nome'].lower()}", chave))
+    return opcoes
 
 
 # ---------- pontos-chave para exibir ----------

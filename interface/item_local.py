@@ -2,7 +2,13 @@ from textual import on
 from textual.containers import Horizontal
 from textual.widgets import Button, Collapsible, Label, Markdown
 
-from features.mapa import abrir_no_navegador, agrupar_pontos, esta_aberto
+from features.mapa import (
+    abrir_no_navegador,
+    agrupar_pontos,
+    esta_aberto,
+    listar_acessibilidade,
+    local_acessivel,
+)
 from utils.formatacao import formatar_dias, formatar_horario
 
 
@@ -17,11 +23,13 @@ class BotaoLink(Button):
 
 
 def titulo_local(local: dict) -> str:
+    partes = [local["nome"]]
     aberto = esta_aberto(local)
-    if aberto is None:
-        return local["nome"]
-    status = "🟢 Aberto agora" if aberto else "🔴 Fechado agora"
-    return f"{local['nome']}  ·  {status}"
+    if aberto is not None:
+        partes.append("🟢 Aberto agora" if aberto else "🔴 Fechado agora")
+    if local_acessivel(local):
+        partes.append("♿ Acessível")
+    return "  ·  ".join(partes)
 
 
 def markdown_local(local: dict) -> str:
@@ -48,13 +56,17 @@ class ItemLocal(Collapsible):
     ItemLocal .nome-local { width: auto; text-style: bold; }
     ItemLocal .texto-ponto { width: 1fr; }
     ItemLocal .destacado { color: $warning; text-style: bold; }
+    ItemLocal .indisponivel { color: $error; }
+    ItemLocal .sem-info { color: $text-muted; }
     ItemLocal .rotulo-pontos { margin-top: 1; text-style: bold; }
     ItemLocal .btn-link { min-width: 8; height: 1; border: none; }
     ItemLocal .link-local { width: 1fr; margin-top: 1; color: $text-muted; }
     ItemLocal .btn-abrir { margin-top: 1; }
     """
 
-    def __init__(self, local: dict, busca: str = "", expandido: bool = False):
+    def __init__(
+        self, local: dict, busca: str = "", expandido: bool = False, recurso: str = ""
+    ):
         # 1) monta os filhos (como o TopicoItem faz no fórum)
         linha_nome = Horizontal(
             Label(local["nome"], markup=False, classes="nome-local"),
@@ -77,6 +89,24 @@ class ItemLocal(Collapsible):
                         )
                     )
                 filhos.append(Horizontal(*linha))
+
+        filhos.append(Label("Acessibilidade:", classes="rotulo-pontos"))
+        recursos = listar_acessibilidade(local, recurso)
+        if not recursos:
+            filhos.append(
+                Label(
+                    "Informações de acessibilidade não cadastradas",
+                    markup=False,
+                    classes="texto-ponto sem-info",
+                )
+            )
+        for item in recursos:
+            classes = "texto-ponto"
+            if item["destaque"]:
+                classes += " destacado"
+            elif item["indisponivel"]:
+                classes += " indisponivel"
+            filhos.append(Label(f"• {item['texto']}", markup=False, classes=classes))
 
         label_link = Label(
             texto_link(local["nome"], local["link_maps"]),

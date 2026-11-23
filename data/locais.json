@@ -28,11 +28,30 @@
       ]
     }
   },
+  "recursos_acessibilidade": {
+    "rampa": {
+      "nome": "Rampa"
+    },
+    "elevador": {
+      "nome": "Elevador"
+    },
+    "banheiro_adaptado": {
+      "nome": "Banheiro adaptado"
+    },
+    "piso_tatil": {
+      "nome": "Piso tátil"
+    },
+    "vaga_pcd": {
+      "nome": "Vaga para pessoa com deficiência"
+    }
+  },
   "locais": [
     {
       "id": "reitoria",
       "nome": "Reitoria (Prédio Principal)",
       "endereco": "Prédio Central - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": false,
+      "vagas_exclusivas": false,
       "dias_semana": [
         0,
         1,
@@ -71,12 +90,15 @@
           "fecha": "16:00",
           "link_maps": "https://maps.app.goo.gl/4SKyRSxRTAMcgHVq9"
         }
-      ]
+      ],
+      "acessibilidade": []
     },
     {
       "id": "biologia",
       "nome": "Departamento de Biologia",
       "endereco": "Prédio do Departamento de Biologia - 401, R. Manuel de Medeiros, 97 - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": true,
+      "vagas_exclusivas": true,
       "dias_semana": [
         0,
         1,
@@ -99,7 +121,8 @@
           "fecha": "21:30",
           "link_maps": "https://maps.app.goo.gl/1sjmgFUkFuNicHK27"
         }
-      ]
+      ],
+      "acessibilidade": []
     },
     {
       "id": "biblioteca-central",
@@ -118,12 +141,15 @@
       "latitude": -8.013772,
       "longitude": -34.94824,
       "link_maps": "https://maps.app.goo.gl/rb5AQc27VDk8aoTm6",
-      "pontos_chave": []
+      "pontos_chave": [],
+      "acessibilidade": []
     },
     {
       "id": "ceagri-ii",
       "nome": "CEAGRI II",
       "endereco": "Praça Farias Neves, 2 - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": true,
+      "vagas_exclusivas": true,
       "dias_semana": [
         0,
         1,
@@ -178,6 +204,12 @@
           "fecha": null,
           "link_maps": null
         }
+      ],
+      "acessibilidade": [
+        {
+          "recurso": "elevador",
+          "onde": "para cadeirantes"
+        }
       ]
     },
     {
@@ -230,7 +262,8 @@
           "fecha": null,
           "link_maps": null
         }
-      ]
+      ],
+      "acessibilidade": []
     }
   ]
 }
