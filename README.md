@@ -93,15 +93,16 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 
 | RF | Módulo | O que faz |
 |---|---|---|
-| RF006 - Criar evento | Agenda | Criação de eventos na agenda (título, data, horário, descrição e local) — exige cadastro. |
-| RF007 - Excluir evento | Agenda | Exclusão de um evento da agenda pelo seu autor. |
-| RF008 - Busca e filtro de eventos | Agenda | Busca por texto e filtros na listagem de eventos. |
-| RF009 - Badges e missões | Gamificação | Sistema de badges e missões: missões de conquista (rendem badge) e missão diária sorteada; a badge em uso aparece ao lado do username. |
-| RF010 - Apagar tópicos | Moderação de conteúdo | O usuário apaga os tópicos que criou (os comentários e anexos do tópico também são removidos). |
-| RF011 - Apagar comentários | Moderação de conteúdo | O usuário apaga os comentários que fez. |
-| RF012 - Listagem de locais | Mapa | Listagem dos locais do campus com endereço, horário de funcionamento, status aberto/fechado e pontos-chave. |
-| RF013 - Busca e filtro de locais | Mapa | Busca e filtro de localidades específicas, por nome, ponto-chave ou sinônimo. |
-| RF014 - Acessibilidade | Acessibilidade | Indicação e filtro de recursos de acessibilidade dos locais do campus. |
+| RF006 - Listagem de eventos | Agenda | Listagem dos eventos criados na agenda. |
+| RF007 - Criar evento | Agenda | Criação de eventos na agenda (título, data, horário, descrição e local) — exige cadastro. |
+| RF008 - Excluir evento | Agenda | Exclusão de um evento da agenda pelo seu autor. |
+| RF009 - Busca e filtro de eventos | Agenda | Busca por texto e filtros na listagem de eventos. |
+| RF010 - Badges e missões | Gamificação | Sistema de badges e missões: missões de conquista (rendem badge) e missão diária sorteada; a badge em uso aparece ao lado do username. |
+| RF011 - Apagar tópicos | Moderação de conteúdo | O usuário apaga os tópicos que criou (os comentários e anexos do tópico também são removidos). |
+| RF012 - Apagar comentários | Moderação de conteúdo | O usuário apaga os comentários que fez. |
+| RF013 - Listagem de locais | Mapa | Listagem dos locais do campus com endereço, horário de funcionamento, status aberto/fechado e pontos-chave. |
+| RF014 - Busca e filtro de locais | Mapa | Busca e filtro de localidades específicas, por nome, ponto-chave ou sinônimo. |
+| RF015 - Acessibilidade | Acessibilidade/Mapa | Indicação e filtro de recursos de acessibilidade dos locais do campus. |
 
 ### Planejado (próximas entregas)
 
