@@ -1,49 +1,24 @@
 {
   "categorias": {
     "banheiro": {
-      "sinonimos": [
-        "wc",
-        "sanitario",
-        "toalete",
-        "lavabo"
-      ]
+      "sinonimos": ["wc", "sanitario", "toalete", "lavabo"]
     },
     "departamento": {
-      "sinonimos": [
-        "dc",
-        "computacao"
-      ]
+      "sinonimos": ["dc", "computacao"]
     },
     "servico": {
-      "sinonimos": [
-        "atendimento",
-        "sebrae"
-      ]
+      "sinonimos": ["atendimento", "sebrae"]
     },
     "estudantil": {
-      "sinonimos": [
-        "diretorio academico",
-        "dalb",
-        "da"
-      ]
+      "sinonimos": ["diretorio academico", "dalb", "da"]
     }
   },
   "recursos_acessibilidade": {
-    "rampa": {
-      "nome": "Rampa"
-    },
-    "elevador": {
-      "nome": "Elevador"
-    },
-    "banheiro_adaptado": {
-      "nome": "Banheiro adaptado"
-    },
-    "piso_tatil": {
-      "nome": "Piso tátil"
-    },
-    "vaga_pcd": {
-      "nome": "Vaga para pessoa com deficiência"
-    }
+    "rampa": {"nome": "Rampa"},
+    "elevador": {"nome": "Elevador"},
+    "banheiro_adaptado": {"nome": "Banheiro adaptado"},
+    "piso_tatil": {"nome": "Piso tátil"},
+    "vaga_pcd": {"nome": "Vaga para pessoa com deficiência"}
   },
   "locais": [
     {
@@ -52,13 +27,7 @@
       "endereco": "Prédio Central - Dois Irmãos, Recife - PE, 52171-900",
       "elevador": false,
       "vagas_exclusivas": false,
-      "dias_semana": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "dias_semana": [0, 1, 2, 3, 4],
       "abre": "08:00",
       "fecha": "17:00",
       "andares_alem_do_terreo": 2,
@@ -99,13 +68,7 @@
       "endereco": "Prédio do Departamento de Biologia - 401, R. Manuel de Medeiros, 97 - Dois Irmãos, Recife - PE, 52171-900",
       "elevador": true,
       "vagas_exclusivas": true,
-      "dias_semana": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "dias_semana": [0, 1, 2, 3, 4],
       "abre": "07:00",
       "fecha": "21:50",
       "andares_alem_do_terreo": null,
@@ -128,13 +91,7 @@
       "id": "biblioteca-central",
       "nome": "Biblioteca Central",
       "endereco": "Rua Dom Manuel de Medeiros, s/n - Dois Irmãos, Recife - PE, 52171-900",
-      "dias_semana": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "dias_semana": [0, 1, 2, 3, 4],
       "abre": "08:00",
       "fecha": "21:00",
       "andares_alem_do_terreo": null,
@@ -150,13 +107,7 @@
       "endereco": "Praça Farias Neves, 2 - Dois Irmãos, Recife - PE, 52171-900",
       "elevador": true,
       "vagas_exclusivas": true,
-      "dias_semana": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "dias_semana": [0, 1, 2, 3, 4],
       "abre": "07:00",
       "fecha": "21:00",
       "andares_alem_do_terreo": 3,
@@ -206,23 +157,14 @@
         }
       ],
       "acessibilidade": [
-        {
-          "recurso": "elevador",
-          "onde": "para cadeirantes"
-        }
+        {"recurso": "elevador", "onde": "para cadeirantes"}
       ]
     },
     {
       "id": "educacao-fisica",
       "nome": "Departamento de Educação Física",
       "endereco": "R. Manuel de Medeiros - Sítio dos Pintos, Recife - PE, 52171-030",
-      "dias_semana": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "dias_semana": [0, 1, 2, 3, 4],
       "abre": "07:00",
       "fecha": "21:50",
       "andares_alem_do_terreo": 3,
