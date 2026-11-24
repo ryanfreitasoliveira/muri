@@ -107,26 +107,7 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 <a id="fluxogramas"></a>
 ## 🔀 Fluxogramas
 
-Os fluxogramas de cada requisito ficam na pasta [`docs/fluxogramas/`](docs/fluxogramas/).
-
-| RF | Fluxograma |
-|---|---|
-| RF001 - Cadastro e Login | [PDF](docs/fluxogramas/RF001-cadastro-login.pdf) |
-| RF002 - Criação de tópico | [PDF](docs/fluxogramas/RF002-criacao-topico.pdf) |
-| RF003 - Responder tópico | [PDF](docs/fluxogramas/RF003-responder-topico.pdf) |
-| RF004 - Listagem de tópicos | [PDF](docs/fluxogramas/RF004-listagem-topicos.pdf) |
-| RF005 - Busca e filtro | [PDF](docs/fluxogramas/RF005-busca-filtro.pdf) |
-| RF006 - Criar evento | [PDF](docs/fluxogramas/RF006-criar-evento.pdf) |
-| RF007 - Excluir evento | [PDF](docs/fluxogramas/RF007-excluir-evento.pdf) |
-| RF008 - Busca e filtro de eventos | [PDF](docs/fluxogramas/RF008-busca-filtro-eventos.pdf) |
-| RF009 - Badges e missões | [PDF](docs/fluxogramas/RF009-badges-missoes.pdf) |
-| RF010 - Apagar tópicos | [PDF](docs/fluxogramas/RF010-apagar-topicos.pdf) |
-| RF011 - Apagar comentários | [PDF](docs/fluxogramas/RF011-apagar-comentarios.pdf) |
-| RF012 - Listagem de locais | [PDF](docs/fluxogramas/RF012-listagem-locais.pdf) |
-| RF013 - Busca e filtro de locais | [PDF](docs/fluxogramas/RF013-busca-filtro-locais.pdf) |
-| RF014 - Acessibilidade | [PDF](docs/fluxogramas/RF014-acessibilidade.pdf) |
-
-> 📎 Também há um arquivo único com todos os fluxogramas: [`todos-os-fluxogramas.pdf`](docs/fluxogramas/todos-os-fluxogramas.pdf).
+> 📎 Aqui está o arquivo único com todos os fluxogramas: [`todos-os-fluxogramas.pdf`](docs/fluxogramas/todos-os-fluxogramas.pdf).
 
 <a id="estrutura"></a>
 ## 🗂️ Estrutura do projeto
