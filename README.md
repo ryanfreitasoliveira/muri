@@ -35,7 +35,6 @@ O **M.U.R.I.**(Mural Universitário de Rede Interativa) é um mural interativo e
 Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia a dia de quem estuda na universidade:
 
 - um **mapa interativo** do campus;
-- uma aba de **cursos**, que funciona como um fórum privado para os alunos de cada curso;
 - uma **agenda** de eventos;
 - um sistema de **tags** para facilitar a busca e a filtragem de tópicos;
 - um sistema **gamificado de badges** para reconhecer a participação dos usuários.
@@ -44,7 +43,6 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 ## ✨ Funcionalidades
 
 - 💬 **Fórum geral** — criação de tópicos, respostas, busca e filtro por tags
-- 📚 **Cursos** — espaço/fórum privado por curso, com grade, documentos e contatos
 - 🗺️ **Mapa interativo** — pontos do campus (blocos, RU, biblioteca, bicicletário...) com filtros
 - 📅 **Agenda** — criação de eventos, podendo vincular a um local do mapa
 - 🏷️ **Tags** — organização e busca de tópicos
@@ -73,9 +71,16 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 | RF003 - Responder Tópico | Fórum | Resposta a um tópico existente; a resposta é salva e o contador de respostas do tópico é atualizado - Exige cadastro. | P2 · Alta |
 | RF004 - Listagem de tópicos | Fórum | Listagem dos tópicos do fórum global, ordenados por atividade recente, com título, tags, nº de respostas e de visualizações. | P2 · Alta |
 | RF005 - Busca e filtro | Fórum | Busca por texto em tempo real combinada com filtro por tags (ex: sisu, matrícula, bolsas, estágio). | P2 · Alta |
-| RF006 - Aba privada | Cursos | Aba de cursos: cada curso tem seu espaço com grade curricular, documentação, contatos e um fórum restrito aos alunos daquele curso. | P2 · Alta |
-| RF007 -  Mapa interativo | Mapa | Mapa interativo do campus com marcadores por categoria (blocos de aula, RU, biblioteca, bicicletário...), com filtro e detalhes de cada ponto. | P2 · Alta |
-| RF008 - Criação de evento | Agenda | Criação de eventos na agenda (título, data, horário, descrição e local) - Exige cadastro. | P2 · Alta |
+| RF006 - Estrutura da agenda e exibição dos eventos| Agenda | Estrutura em tópicos da agenda, exibindo assim todas as tarefas| P3 · Alta|
+| RF007 - Adicionar eventos na agenda | Agenda | Possibilidade de se adicionar eventos na agenda selecionando o dia.(Exige cadastro) | P2 · Alta |
+| RF008 - Excluir eventos da agenda  | Agenda | Exclusão de eventos já criados anteriormente. | P2 · Alta |
+| RF009 - Filtro de evento na agenda | Agenda | Aba para buscar eventos adicionados na agenda, sendo possivel filtrar pelo conteúdo da tarefa ou pelo dia.| P2 · Alta |
+| RF010- Gamificação por meio de sistema de Badges| Fórum | Criação de missões, objetivos para o usuário concluir e ganhar as Badges.(Exige cadastro) |
+|RF011-  Apagar tópicos criados pelo usuário| Moderação de conteúdo | Capacidade de apagar tópicos criados pelo usuário. | P3 · Regular|
+|RF012-  Apagar comentários feitos pelo usuário| Moderação de conteúdo | Capacidade de apagar comentários feitos pelo usuário. | P3 · Regular|
+|RF013- Listagem dos locais do campus| Mapa | Exibição dos diversos locais do campus em forma de tópicos. | P2 · Alta |
+|RF014- Busca e fltros para locais especificos| Mapa | Filtragem e busca por locais em especifico no campus| P3 · Regular |
+|RF015- Acessibilidade/Mapa| Mapa | Indicação e filtro de recursos de acessibilidade dos locais do campus| P2 · Alta |
 
 > ℹ️ **Observação:** o sistema de badges/gamificação citado na descrição do projeto ainda não possui um requisito funcional detalhado na planilha de origem. 
 
@@ -91,10 +96,10 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 ## 🛠️ Tecnologias
 
 
-- **Front-end:** `a definir`
+- **Front-end:** `Python, usando a biblioteca 'Textual'`
 - **Back-end:** `Python`
-- **Banco de dados:** `a definir`
-- **Outras ferramentas:** `a definir`
+- **Banco de dados:** `SQLite`
+- **Outras ferramentas:** `Pathlib, UUID`
 
 <a id="como-executar"></a>
 ## 🚀 Como executar o projeto
