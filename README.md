@@ -35,7 +35,7 @@ O **M.U.R.I.** (Mural Universitário de Rede Interativa) é um mural interativo 
 
 Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia a dia de quem estuda na universidade:
 
-<<<<<<< HEAD
+
 - um **mapa interativo** do campus, com horários, pontos-chave e recursos de acessibilidade;
 - uma **agenda** de eventos, com busca e filtros;
 - um sistema de **tags** para facilitar a busca e a filtragem de tópicos;
@@ -46,7 +46,6 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 ## ✨ Funcionalidades
 
 - 💬 **Fórum geral** — criação de tópicos, respostas, busca e filtro por tags
-<<<<<<< HEAD
 - 🗑️ **Moderação de conteúdo** — o autor pode apagar os próprios tópicos e comentários (com confirmação)
 - 🗺️ **Mapa do campus** — listagem dos locais com status "aberto/fechado agora", endereço, andares, pontos-chave (banheiros, departamentos, serviços...) e links para o Google Maps
 - 🔎 **Busca no mapa** — por nome do local, ponto-chave ou sinônimo (ex.: `wc`, `dc`, `sebrae`), ignorando acentos
@@ -61,23 +60,23 @@ Além do fórum, a plataforma reúne outras funcionalidades pensadas para o dia 
 ## 🖼️ Preview
 
 <div align="center">
-  <img src="assets/preview-home.png" width="800" alt="Tela inicial com login e cadastro"/>
+  <img src="readme/preview-home.png" width="800" alt="Tela inicial com login e cadastro"/>
   <p><em>Tela inicial: login e cadastro para universitários (@ufrpe.br) e visitantes</em></p>
   <br/>
-  <img src="assets/preview-forum-home.png" width="800" alt="Fórum com lista de tópicos, busca e filtro por tags"/>
+  <img src="readme/preview-forum-home.png" width="800" alt="Fórum com lista de tópicos, busca e filtro por tags"/>
   <p><em>Fórum: tópicos por atividade recente, busca, filtro por tags, visualizações e comentários</em></p>
   <br/>
-  <img src="assets/preview-perfil.png" width="800" alt="Aba Meus dados com missões e badges"/>
+  <img src="readme/preview-perfil.png" width="800" alt="Aba Meus dados com missões e badges"/>
   <p><em>Perfil: dados, missões do dia e de conquista, e galeria de badges</em></p>
   <br/>
-  <img src="assets/preview-mapa.png" width="800" alt="Aba Mapa com locais do campus e filtro de acessibilidade"/>
+  <img src="readme/preview-mapa.png" width="800" alt="Aba Mapa com locais do campus e filtro de acessibilidade"/>
   <p><em>Mapa do campus: status aberto/fechado, busca por ponto-chave e filtro de acessibilidade</em></p>
 </div>
 
 <a id="requisitos-funcionais"></a>
 ## 📋 Requisitos funcionais
 
-<<<<<<< HEAD
+
 ### Release 1 (1ª VA)
 
 
@@ -160,7 +159,7 @@ muri/
 <a id="tecnologias"></a>
 ## 🛠️ Tecnologias
 
-<<<<<<< HEAD
+
 - **Front-end:** `Textual` — construção da interface interativa no terminal.
 - **Back-end:** `Python`
 - **Banco de dados:** `SQLite` — banco de dados relacional que utiliza SQL.
