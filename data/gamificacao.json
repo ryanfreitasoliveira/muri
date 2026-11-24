@@ -1,0 +1,22 @@
+{
+  "badges": [
+    {"id": "primeiros_passos", "nome": "Primeiros Passos", "icone": "🌱", "descricao": "Criou seu primeiro tópico"},
+    {"id": "voz_ativa", "nome": "Voz Ativa", "icone": "💬", "descricao": "Fez seu primeiro comentário"},
+    {"id": "rural_de_coracao", "nome": "Rural de Coração", "icone": "🎓", "descricao": "Tem conta com e-mail @ufrpe.br", "requer_tipo": "universitario"},
+    {"id": "conselheiro", "nome": "Conselheiro", "icone": "🧠", "descricao": "Respondeu 15 tópicos diferentes"},
+    {"id": "em_alta", "nome": "Em Alta", "icone": "🔥", "descricao": "Teve um tópico com 50 visualizações"},
+    {"id": "explorador", "nome": "Explorador", "icone": "🧭", "descricao": "Usou 3 tags diferentes"}
+  ],
+  "missoes": [
+    {"id": "primeiro_topico", "tipo": "conquista", "descricao": "Faça seu primeiro tópico", "metrica": "topicos_criados", "meta": 1, "badge": "primeiros_passos"},
+    {"id": "primeiro_comentario", "tipo": "conquista", "descricao": "Faça seu primeiro comentário", "metrica": "comentarios_feitos", "meta": 1, "badge": "voz_ativa"},
+    {"id": "conta_universitaria", "tipo": "conquista", "descricao": "Tenha uma conta universitária (e-mail @ufrpe.br)", "metrica": "conta_universitaria", "meta": 1, "badge": "rural_de_coracao"},
+    {"id": "responder_15", "tipo": "conquista", "descricao": "Responda 15 tópicos diferentes", "metrica": "topicos_respondidos_distintos", "meta": 15, "badge": "conselheiro"},
+    {"id": "topico_50_views", "tipo": "conquista", "descricao": "Tenha um tópico com 50 visualizações", "metrica": "maior_visualizacao", "meta": 50, "badge": "em_alta"},
+    {"id": "tres_tags", "tipo": "conquista", "descricao": "Use 3 tags diferentes nos seus tópicos", "metrica": "tags_distintas", "meta": 3, "badge": "explorador"},
+
+    {"id": "dia_comentar_3", "tipo": "dia", "descricao": "Faça 3 comentários hoje", "metrica": "comentarios_feitos", "meta": 3},
+    {"id": "dia_criar_topico", "tipo": "dia", "descricao": "Crie 1 tópico hoje", "metrica": "topicos_criados", "meta": 1},
+    {"id": "dia_responder_2", "tipo": "dia", "descricao": "Responda 2 tópicos diferentes hoje", "metrica": "topicos_respondidos_distintos", "meta": 2}
+  ]
+}

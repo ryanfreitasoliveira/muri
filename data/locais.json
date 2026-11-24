@@ -1,0 +1,211 @@
+{
+  "categorias": {
+    "banheiro": {
+      "sinonimos": ["wc", "sanitario", "toalete", "lavabo"]
+    },
+    "departamento": {
+      "sinonimos": ["dc", "computacao"]
+    },
+    "servico": {
+      "sinonimos": ["atendimento", "sebrae"]
+    },
+    "estudantil": {
+      "sinonimos": ["diretorio academico", "dalb", "da"]
+    }
+  },
+  "recursos_acessibilidade": {
+    "rampa": {"nome": "Rampa"},
+    "elevador": {"nome": "Elevador"},
+    "banheiro_adaptado": {"nome": "Banheiro adaptado"},
+    "piso_tatil": {"nome": "Piso tátil"},
+    "vaga_pcd": {"nome": "Vaga para pessoa com deficiência"}
+  },
+  "locais": [
+    {
+      "id": "reitoria",
+      "nome": "Reitoria (Prédio Principal)",
+      "endereco": "Prédio Central - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": false,
+      "vagas_exclusivas": false,
+      "dias_semana": [0, 1, 2, 3, 4],
+      "abre": "08:00",
+      "fecha": "17:00",
+      "andares_alem_do_terreo": 2,
+      "latitude": -8.014206,
+      "longitude": -34.950737,
+      "link_maps": "https://maps.app.goo.gl/kV6Bo2ddUcrWc92c8",
+      "pontos_chave": [
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "1º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Espaço de Atendimento SEBRAE",
+          "categoria": "servico",
+          "andar": null,
+          "abre": "08:00",
+          "fecha": "16:00",
+          "link_maps": "https://maps.app.goo.gl/3rB8AXLibVWsVRMB7"
+        },
+        {
+          "nome": "Escola de Conselhos de Pernambuco",
+          "categoria": "servico",
+          "andar": null,
+          "abre": "09:00",
+          "fecha": "16:00",
+          "link_maps": "https://maps.app.goo.gl/4SKyRSxRTAMcgHVq9"
+        }
+      ],
+      "acessibilidade": []
+    },
+    {
+      "id": "biologia",
+      "nome": "Departamento de Biologia",
+      "endereco": "Prédio do Departamento de Biologia - 401, R. Manuel de Medeiros, 97 - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": true,
+      "vagas_exclusivas": true,
+      "dias_semana": [0, 1, 2, 3, 4],
+      "abre": "07:00",
+      "fecha": "21:50",
+      "andares_alem_do_terreo": null,
+      "latitude": -8.013705,
+      "longitude": -34.950518,
+      "link_maps": "https://maps.app.goo.gl/r8wMtrUXtJFbEmiK7",
+      "pontos_chave": [
+        {
+          "nome": "DALB - Diretório Acadêmico de Licenciatura em Ciências Biológicas",
+          "categoria": "estudantil",
+          "andar": null,
+          "abre": "13:00",
+          "fecha": "21:30",
+          "link_maps": "https://maps.app.goo.gl/1sjmgFUkFuNicHK27"
+        }
+      ],
+      "acessibilidade": []
+    },
+    {
+      "id": "biblioteca-central",
+      "nome": "Biblioteca Central",
+      "endereco": "Rua Dom Manuel de Medeiros, s/n - Dois Irmãos, Recife - PE, 52171-900",
+      "dias_semana": [0, 1, 2, 3, 4],
+      "abre": "08:00",
+      "fecha": "21:00",
+      "andares_alem_do_terreo": null,
+      "latitude": -8.013772,
+      "longitude": -34.94824,
+      "link_maps": "https://maps.app.goo.gl/rb5AQc27VDk8aoTm6",
+      "pontos_chave": [],
+      "acessibilidade": []
+    },
+    {
+      "id": "ceagri-ii",
+      "nome": "CEAGRI II",
+      "endereco": "Praça Farias Neves, 2 - Dois Irmãos, Recife - PE, 52171-900",
+      "elevador": true,
+      "vagas_exclusivas": true,
+      "dias_semana": [0, 1, 2, 3, 4],
+      "abre": "07:00",
+      "fecha": "21:00",
+      "andares_alem_do_terreo": 3,
+      "latitude": -8.017663,
+      "longitude": -34.944735,
+      "link_maps": "https://maps.app.goo.gl/H3Xi9zt2iNBTf2om6",
+      "pontos_chave": [
+        {
+          "nome": "Departamento de Computação (DC)",
+          "categoria": "departamento",
+          "andar": null,
+          "abre": null,
+          "fecha": null,
+          "link_maps": "https://maps.app.goo.gl/sHmxTAyKyrRf5vUr9"
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "térreo",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "1º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "2º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "3º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        }
+      ],
+      "acessibilidade": [
+        {"recurso": "elevador", "onde": "para cadeirantes"}
+      ]
+    },
+    {
+      "id": "educacao-fisica",
+      "nome": "Departamento de Educação Física",
+      "endereco": "R. Manuel de Medeiros - Sítio dos Pintos, Recife - PE, 52171-030",
+      "dias_semana": [0, 1, 2, 3, 4],
+      "abre": "07:00",
+      "fecha": "21:50",
+      "andares_alem_do_terreo": 3,
+      "latitude": -8.018039,
+      "longitude": -34.949354,
+      "link_maps": "https://maps.app.goo.gl/2RBo6LN75bTfGqnT7",
+      "pontos_chave": [
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "térreo",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "1º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "2º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        },
+        {
+          "nome": "Banheiro",
+          "categoria": "banheiro",
+          "andar": "3º andar",
+          "abre": null,
+          "fecha": null,
+          "link_maps": null
+        }
+      ],
+      "acessibilidade": []
+    }
+  ]
+}
