@@ -1,9 +1,10 @@
 import sqlite3
 from pathlib import Path
-from datetime import datetime
+from datetime import date, datetime
 from models.topico import Topico
 from models.usuario import Cadastro
 from models.resposta import Resposta
+from models.tarefa import Tarefa
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CAMINHO_BANCO = BASE_DIR / "dados" / "muri.db"
@@ -39,6 +40,15 @@ def criar_tabelas():
             topico_id TEXT NOT NULL REFERENCES topicos(id),
             autor_email TEXT REFERENCES usuarios(email),
             conteudo TEXT NOT NULL,
+            data_criacao TEXT
+        )
+    """)
+    conexao.execute("""
+        CREATE TABLE IF NOT EXISTS tarefas (
+            id TEXT PRIMARY KEY,
+            usuario_email TEXT NOT NULL REFERENCES usuarios(email),
+            dia TEXT NOT NULL,
+            texto TEXT NOT NULL,
             data_criacao TEXT
         )
     """)
@@ -215,6 +225,7 @@ def deletar_usuario(email):
         conexao.execute("DELETE FROM topicos WHERE autor_email = ?", (email,))
         for tabela in ("badges_usuarios", "badge_ativa", "missao_diaria"):
             conexao.execute(f"DELETE FROM {tabela} WHERE email = ?", (email,))
+        conexao.execute("DELETE FROM tarefas WHERE usuario_email = ?", (email,))
         cursor = conexao.execute("DELETE FROM usuarios WHERE email = ?", (email,))
         conexao.commit()
         return cursor.rowcount > 0
@@ -262,6 +273,10 @@ def atualizar_usuario(email_antigo, usuario):
                     f"UPDATE {tabela} SET email = ? WHERE email = ?",
                     (usuario.email, email_antigo),
                 )
+            conexao.execute(
+                "UPDATE tarefas SET usuario_email = ? WHERE usuario_email = ?",
+                (usuario.email, email_antigo),
+            )
         conexao.commit()
         return True
     except sqlite3.IntegrityError:
@@ -316,3 +331,70 @@ def listar_respostas_do_usuario(email):
     ).fetchall()
     conexao.close()
     return linhas
+
+# ---------- Agenda (tarefas por dia) ----------
+
+
+def inserir_tarefa(tarefa: Tarefa):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        conexao.execute(
+            "INSERT INTO tarefas (id, usuario_email, dia, texto, data_criacao) VALUES (?, ?, ?, ?, ?)",
+            (
+                str(tarefa.id),
+                tarefa.usuario_email,
+                tarefa.dia.isoformat(),
+                tarefa.texto,
+                datetime.now().isoformat(),
+            ),
+        )
+        conexao.commit()
+    finally:
+        conexao.close()
+
+
+def listar_tarefas_do_dia(email, dia: date):
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        linhas = conexao.execute(
+            "SELECT id, usuario_email, dia, texto FROM tarefas "
+            "WHERE usuario_email = ? AND dia = ? ORDER BY data_criacao ASC",
+            (email, dia.isoformat()),
+        ).fetchall()
+    finally:
+        conexao.close()
+    return [
+        Tarefa(id=id_, usuario_email=u, dia=date.fromisoformat(d), texto=t)
+        for id_, u, d, t in linhas
+    ]
+
+
+def deletar_tarefa(id_tarefa, email):
+    """Só apaga se a tarefa pertencer ao usuário informado."""
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        cursor = conexao.execute(
+            "DELETE FROM tarefas WHERE id = ? AND usuario_email = ?",
+            (str(id_tarefa), email),
+        )
+        conexao.commit()
+        return cursor.rowcount > 0
+    finally:
+        conexao.close()
+
+
+def listar_tarefas_do_usuario(email):
+    """Todas as tarefas do usuário (todos os dias), em ordem de dia e criação."""
+    conexao = sqlite3.connect(CAMINHO_BANCO)
+    try:
+        linhas = conexao.execute(
+            "SELECT id, usuario_email, dia, texto FROM tarefas "
+            "WHERE usuario_email = ? ORDER BY dia ASC, data_criacao ASC",
+            (email,),
+        ).fetchall()
+    finally:
+        conexao.close()
+    return [
+        Tarefa(id=id_, usuario_email=u, dia=date.fromisoformat(d), texto=t)
+        for id_, u, d, t in linhas
+    ]
